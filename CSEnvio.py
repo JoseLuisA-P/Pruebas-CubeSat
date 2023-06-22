@@ -4,7 +4,7 @@ import random
 
 if __name__=="__main__":
     print("Ready ...")
-    ser = serial.Serial('COM3',baudrate=115200)
+    ser = serial.Serial('COM6',baudrate=115200)
 
     if ser.isOpen():
         
