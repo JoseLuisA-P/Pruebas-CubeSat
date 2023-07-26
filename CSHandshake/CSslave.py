@@ -2,7 +2,7 @@ import serial
 
 if __name__=="__main__":
     print("Ready ...")
-    ser = serial.Serial('COM6',baudrate=115200)
+    ser = serial.Serial('COM6',baudrate=115200, timeout=1)
 
     if ser.isOpen():
         
