@@ -18,6 +18,6 @@ void setup()
 
 void loop() 
 {
-  uart.SendPackage(&test,size);
+  uart.SendPackage(test,size);
   delay(1000);
 }

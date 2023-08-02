@@ -6,7 +6,7 @@ class UARTSocket
 {
   public:
     UARTSocket(int RX,int TX,int baudrate,int timeout,int maxretries);
-    void SendPackage(uint8_t(*)[] message,size_t messlen);
+    void SendPackage(uint8_t* message,size_t messlen);
 
   private:
     SoftwareSerial *uart;

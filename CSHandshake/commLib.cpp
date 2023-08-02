@@ -10,13 +10,13 @@ UARTSocket::UARTSocket(int RX,int TX,int baudrate,int timeout,int maxretries)
   _maxretries = maxretries;
 }
 
-void UARTSocket::SendPackage(uint8_t(*) message,size_t messlen)
+void UARTSocket::SendPackage(uint8_t* message,size_t messlen)
 {  
   int retries = 0;
 
   while(!_ACK && retries<_maxretries)
   {
-    uart->write(message, messlen);
+      uart->write(message,messlen);
     unsigned long startTime = millis();
 
     while (!_ACK && (millis() - startTime) < _timeout) 
