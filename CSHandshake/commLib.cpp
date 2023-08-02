@@ -45,3 +45,19 @@ void UARTSocket::SendPackage(uint8_t* message,size_t messlen)
 
   _ACK = false;
 }
+
+uint16_t UARTSocket::calculateCRC(uint8_t* data, size_t length) {
+  uint16_t crc = _CRC_INITIAL;
+
+  for (size_t i = 0; i < length; i++) {
+    crc ^= (uint16_t)data[i] << 8;
+    for (int j = 0; j < 8; j++) {
+      if (crc & 0x8000)
+        crc = (crc << 1) ^ _CRC_POLYNOMIAL;
+      else
+        crc <<= 1;
+    }
+  }
+
+  return crc;
+}

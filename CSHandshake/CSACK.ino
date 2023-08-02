@@ -8,8 +8,15 @@
 #define MAXRETRIES  3
 
 UARTSocket uart(RX_PIN,TX_PIN,BAUDRATE,TIMEOUT,MAXRETRIES);
+
 uint8_t test[] = {42,43,44,45};
-size_t size = sizeof(test);
+
+uint8_t destination = 020;
+uint8_t messageSize = 000;
+uint8_t selfAddress = 001;
+size_t size = 000;
+
+uint16_t SendCRC = 0;
 
 void setup() 
 {
@@ -18,6 +25,9 @@ void setup()
 
 void loop() 
 {
-  uart.SendPackage(test,size);
+  messageSize = sizeof(test);
+  uart.SendPackage(test,messageSize);
+  SendCRC = uart.calculateCRC(test,messageSize);
+  Serial.println(SendCRC);
   delay(1000);
 }
