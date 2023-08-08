@@ -61,3 +61,32 @@ uint16_t UARTSocket::calculateCRC(uint8_t* data, size_t length) {
 
   return crc;
 }
+
+/*Device identification
+  sendDeviceId: 
+  Params to receive > device address
+  it establishes the slaves' addresses
+  checkDeviceAddress:
+  Params to receive >  received_info, my_address
+  Each byte begins and ends with a start and stop bit,
+  following the UART standard. When the address bit is set to one by any of the nodes,
+  it causes an interrupt in the other nodes on the bus. Each node then checks if the
+  address matches its own. If it is not addressed, the node can ignore subsequent
+  bytes (address bits being zero).
+*/
+int UARTSocket::sendDeviceId(int device_address){
+  if (device_address < 0 || device_address > 255) {
+      // Handle the error
+      Serial.println("Device address out of range");
+      return -1; // indicate an error condition
+  }
+
+  // toggle pin to send mode
+  
+
+}
+
+bool UARTSocket::checkDeviceAddress(int received_info, int my_address){
+  
+  return check;
+}

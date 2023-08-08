@@ -6,8 +6,20 @@ class UARTSocket
 {
   public:
     UARTSocket(int RX,int TX,int baudrate,int timeout,int maxretries);
+    // device identification
+    int sendDeviceId(int device_address); // send device id
+    bool checkDeviceAddress(int received_info, int my_address); // will check if the byte received matches the device address
+
+    // parameters setting
+    int setBaudRate(int baud_rate);
+
+    // transaction flow
+
+
     void SendPackage(uint8_t* message,size_t messlen);
     uint16_t calculateCRC(uint8_t* data, size_t length); 
+    
+
 
   private:
     SoftwareSerial *uart;
