@@ -82,8 +82,15 @@ int UARTSocket::sendDeviceId(int device_address){
   }
 
   // toggle pin to send mode
-  
 
+  // send address
+  SendPackage(device_address)
+
+}
+
+
+int UARTSocket::receiveDeviceID(int device_address){
+  
 }
 
 bool UARTSocket::checkDeviceAddress(int received_info, int my_address){
