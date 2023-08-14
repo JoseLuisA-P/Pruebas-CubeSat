@@ -2,16 +2,15 @@
 #include <SoftwareSerial.h>
 #include "commLib.h"
 
-UARTSocket::UARTSocket(int RX,int TX,int baudrate,int timeout,int maxretries,int en1, int en2)
+UARTSocket::UARTSocket(int RX,int TX,int baudrate,int timeout,int maxretries,int en)
 {
   uart = new SoftwareSerial(RX,TX);
   uart->begin(baudrate);
   _timeout = timeout;
   _maxretries = maxretries;
-  _en1 = en1;
-  _en2 = en2;
-  pinMode(en1,OUTPUT);
-  pinMode(en2,OUTPUT);
+  _en = en;
+  pinMode(en,OUTPUT);
+
 }
 
 void UARTSocket::SendPackage(uint8_t* message,size_t messlen)
@@ -20,15 +19,15 @@ void UARTSocket::SendPackage(uint8_t* message,size_t messlen)
 
   while(!_ACK && retries<_maxretries)
   {
-    digitalWrite(_en1,HIGH);
-    digitalWrite(_en2,LOW);
+    digitalWrite(_en,HIGH); // ya esta comenzando en transmision
+    // envia el mensaje
     uart->write(message,messlen);
     unsigned long startTime = millis();
 
     while (!_ACK && (millis() - startTime) < _timeout) 
     {
-      digitalWrite(_en1,LOW);
-      digitalWrite(_en2,HIGH);
+      digitalWrite(_en,LOW); // cambiamos a modo recepcion
+
       byte temp = uart->read();
 
       if (temp == 'A') { // Recibe el ACK
@@ -54,6 +53,21 @@ void UARTSocket::SendPackage(uint8_t* message,size_t messlen)
   _ACK = false;
 }
 
+void UARTSocket::ReceivePackage(){
+//----Leemos la respuesta del Esclavo-----
+  digitalWrite(_en, LOW); //RS485 como receptor
+  if(Serial.find("i"))//esperamos el inicio de trama (start bit, por el momento definimos un char como inicio de paquete)
+  {
+      int dato=Serial.parseInt(); //recibimos valor numérico
+      if(Serial.read()=='f') //Si el fin de trama es el correcto
+       {
+        if(Serial)Serial.println(dato);  //Realizamos la acción correspondiente          
+      }
+      
+  }
+  digitalWrite(_en, HIGH); //RS485 como Transmisor
+}
+  
 uint16_t UARTSocket::calculateCRC(uint8_t* data, size_t length) {
   uint16_t crc = _CRC_INITIAL;
 
@@ -82,26 +96,26 @@ uint16_t UARTSocket::calculateCRC(uint8_t* data, size_t length) {
   address matches its own. If it is not addressed, the node can ignore subsequent
   bytes (address bits being zero).
 */
-int UARTSocket::sendDeviceId(int device_address){
-  if (device_address < 0 || device_address > 255) {
-      // Handle the error
-      Serial.println("Device address out of range");
-      return -1; // indicate an error condition
-  }
+// int UARTSocket::sendDeviceId(int device_address){
+//   if (device_address < 0 || device_address > 255) {
+//       // Handle the error
+//       Serial.println("Device address out of range");
+//       return -1; // indicate an error condition
+//   }
 
-  // toggle pin to send mode
+//   // toggle pin to send mode
 
-  // send address
-  SendPackage(device_address)
+//   // send address
+//   SendPackage(device_address)
 
-}
+// }
 
 
-int UARTSocket::receiveDeviceID(int device_address){
+// int UARTSocket::receiveDeviceID(int device_address){
   
-}
+// }
 
-bool UARTSocket::checkDeviceAddress(int received_info, int my_address){
+// bool UARTSocket::checkDeviceAddress(int received_info, int my_address){
   
-  return check;
-}
+//   return check;
+// }

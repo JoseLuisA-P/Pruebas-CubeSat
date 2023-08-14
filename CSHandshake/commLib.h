@@ -5,7 +5,6 @@
 class UARTSocket
 {
   public:
-<<<<<<< HEAD
     UARTSocket(int RX,int TX,int baudrate,int timeout,int maxretries);
     // device identification
     int sendDeviceId(int device_address); // send device id
@@ -16,10 +15,7 @@ class UARTSocket
 
     // transaction flow
 
-
-=======
     UARTSocket(int RX,int TX,int baudrate,int timeout,int maxretries,int en1, int en2);
->>>>>>> 9c660b3e54d9c275bfe2a39e1e4d37a3ba60d0cb
     void SendPackage(uint8_t* message,size_t messlen);
     uint16_t calculateCRC(uint8_t* data, size_t length); 
     
@@ -29,8 +25,7 @@ class UARTSocket
     SoftwareSerial *uart;
     int _timeout;
     int _maxretries;
-    uint8_t _en1;
-    uint8_t _en2;
+    uint8_t _en;
     bool _ACK;
     uint16_t _CRC_POLYNOMIAL = 0x1021;  // CRC-16-CCITT polynomial
     uint16_t _CRC_INITIAL = 0xFFFF;  // Initial value for CRC calculation
