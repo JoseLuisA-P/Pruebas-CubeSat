@@ -3,11 +3,14 @@
 
 #define RX_PIN      10
 #define TX_PIN      11
+#define EN1_PIN      9
+#define EN2_PIN      8
+
 #define BAUDRATE    9600
 #define TIMEOUT     1000
 #define MAXRETRIES  3
 
-UARTSocket uart(RX_PIN,TX_PIN,BAUDRATE,TIMEOUT,MAXRETRIES);
+UARTSocket uart(RX_PIN,TX_PIN,BAUDRATE,TIMEOUT,MAXRETRIES,EN1_PIN,EN2_PIN);
 
 uint8_t test[] = {42,43,44,45};
 
