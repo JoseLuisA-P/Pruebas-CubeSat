@@ -2,12 +2,16 @@
 #include <SoftwareSerial.h>
 #include "commLib.h"
 
-UARTSocket::UARTSocket(int RX,int TX,int baudrate,int timeout,int maxretries)
+UARTSocket::UARTSocket(int RX,int TX,int baudrate,int timeout,int maxretries,int en1, int en2)
 {
   uart = new SoftwareSerial(RX,TX);
   uart->begin(baudrate);
   _timeout = timeout;
   _maxretries = maxretries;
+  _en1 = en1;
+  _en2 = en2;
+  pinMode(en1,OUTPUT);
+  pinMode(en2,OUTPUT);
 }
 
 void UARTSocket::SendPackage(uint8_t* message,size_t messlen)
@@ -16,11 +20,15 @@ void UARTSocket::SendPackage(uint8_t* message,size_t messlen)
 
   while(!_ACK && retries<_maxretries)
   {
-      uart->write(message,messlen);
+    digitalWrite(_en1,HIGH);
+    digitalWrite(_en2,LOW);
+    uart->write(message,messlen);
     unsigned long startTime = millis();
 
     while (!_ACK && (millis() - startTime) < _timeout) 
     {
+      digitalWrite(_en1,LOW);
+      digitalWrite(_en2,HIGH);
       byte temp = uart->read();
 
       if (temp == 'A') { // Recibe el ACK
