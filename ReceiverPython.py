@@ -5,7 +5,7 @@ import binascii
 SERIAL_PORT = 'COM4'
 BAUD_RATE = 9600
 message_test = [105, 42,43,44,45, 102] # 105 corresponde a "i" y 102 a "f"
-ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=2)
 def receive_data_with_ack():
     
     received_data = bytearray()
@@ -90,32 +90,18 @@ def send_package_with_start():
 #    send_package_with_start()
 
 # ciclo de escucha y trasmision
-# Ciclo de escucha
 while True:
     received_data = ser.read(1)
-    print("Received:", received_data)
-    if received_data:
-        hex_data = binascii.hexlify(received_data)  # Convert to hex
-        print("Received:", hex_data)
-        
-        # Send ACK back to Arduino
-        ack_byte = bytes([0xBB])  # Send ACK byte (0xBB) back to Arduino
-        ser.write(ack_byte)
-        print("Sending ACK...")
-        
-#         ser.write(b'A')
-# while True:
-#     received_data = ser.read(1)
-#     if received_data:  # Si hay datos recibidos
-#         ser.write(b'A')
-#     #ser.flush()
-#     # received_data = ser.read(1)
-#     # hex_data = '%02x' % ord(received_data)
-#     print(received_data)
-#     if received_data:  # Si hay datos recibidos
-#         # print(received_data)
-#         # Verificar dirección y manejar la respuesta
-#         if received_data[0] == 0b10101010:  # Cambiar por la dirección correcta
-#             # Aquí puedes enviar la respuesta correspondiente
-#             # response_data = b'Response data'
-#             send_package_with_start(message_test)
+    if received_data:  # Si hay datos recibidos
+        ser.write(b'A')
+    #ser.flush()
+    # received_data = ser.read(1)
+    # hex_data = '%02x' % ord(received_data)
+        print(received_data)
+    # if received_data:  # Si hay datos recibidos
+    #     # print(received_data)
+    #     # Verificar dirección y manejar la respuesta
+    #     if received_data[0] == 0b10101010:  # Cambiar por la dirección correcta
+    #         # Aquí puedes enviar la respuesta correspondiente
+    #         # response_data = b'Response data'
+    #         send_package_with_start(message_test)

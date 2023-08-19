@@ -9,54 +9,44 @@ UARTSocket::UARTSocket(int RX, int TX, int baudrate, int timeout, int maxretries
   _maxretries = maxretries;
   _en1 = en1;
   _en2 = en2;
-  pinMode(_en1, OUTPUT);
-  pinMode(_en2, OUTPUT);
+  pinMode(en1, OUTPUT);
+  pinMode(en2, OUTPUT);
 }
-
-void UARTSocket::SendPackage(uint8_t* message, size_t messlen) {
+void UARTSocket::SendPackage(uint8_t* message,size_t messlen)
+{  
   int retries = 0;
 
-  while (!_ACK && retries < _maxretries) {
-    digitalWrite(_en1, HIGH);  // ya esta comenzando en transmision el arduino
-    digitalWrite(_en2, LOW); // entonces el slave comienza en recepcion
-    //Serial.println("modo transmision");
-    // envia el mensaje
-    uart->write(message, messlen);
-    Serial.println("enviando");
-    Serial.print("Message content: ");
-    for (size_t i = 0; i < messlen; i++) {
-      Serial.print(message[i]);
-      Serial.print(" ");
-    }
-    Serial.println();  // Imprime una nueva línea al final
-    delay(1000);
+  while(!_ACK && retries<_maxretries)
+  {
+    digitalWrite(_en1,HIGH);
+    digitalWrite(_en2,LOW);
+    uart->write(message,messlen);
     unsigned long startTime = millis();
 
-    while (!_ACK && (millis() - startTime) < _timeout) {
-      digitalWrite(_en1, LOW);  // cambiamos a modo recepcion
-      Serial.println("en1 LOW");
-      digitalWrite(_en2, HIGH);  // cambiamos a modo recepcion
-      Serial.println("en2 HIGH");
-      //Serial.println("modo recepcion");
-
+    while (!_ACK && (millis() - startTime) < _timeout) 
+    {
+      digitalWrite(_en1,LOW);
+      digitalWrite(_en2,HIGH);
       byte temp = uart->read();
 
-      if (temp == 'A') {  // Recibe el ACK
+      if (temp == 'A') { // Recibe el ACK
         _ACK = true;
-        if (Serial) Serial.println("Data sent successfully!");
-      }
-
-      else if (temp == 'N') {  // Recibe el NACK
+        if(Serial)Serial.println("Data sent successfully!");
+      } 
+        
+      else if (temp == 'N') { // Recibe el NACK
         _ACK = false;
-        if (Serial) Serial.println("NACK received, retrying...");
+        if(Serial)Serial.println("NACK received, retrying...");
         retries++;
         break;
       }
+
     }
   }
 
-  if (!_ACK) {
-    if (Serial) Serial.println("Fallido despues de muchos intentos");
+  if(!_ACK)
+  {
+    if(Serial)Serial.println("Fallido despues de muchos intentos");
   }
 
   _ACK = false;
