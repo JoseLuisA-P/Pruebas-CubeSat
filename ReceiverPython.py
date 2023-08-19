@@ -1,5 +1,6 @@
 import serial
 import time
+import binascii
 
 SERIAL_PORT = 'COM4'
 BAUD_RATE = 9600
@@ -73,8 +74,48 @@ def send_package(message):
                     
         print("Failed after many attempts")
 
+def send_package_with_start():
+    # Envía el inicio de trama 'i'
+    ser.write(b'i')
+    print('inicio enviado')
+    # Envía el paquete de datos
+    send_package(message_test)
+    time.sleep(0.1)  # Añade una pequeña pausa para asegurarte de que el paquete se envíe completamente
+    print('paquete enviado')
+    # Envía el fin de trama 'f'
+    ser.write(b'f')
+    print('stop enviado')
 
 # if __name__ == "__main__":
-#    send_package(message_test) # definir
+#    send_package_with_start()
 
 # ciclo de escucha y trasmision
+# Ciclo de escucha
+while True:
+    received_data = ser.read(1)
+    print("Received:", received_data)
+    if received_data:
+        hex_data = binascii.hexlify(received_data)  # Convert to hex
+        print("Received:", hex_data)
+        
+        # Send ACK back to Arduino
+        ack_byte = bytes([0xBB])  # Send ACK byte (0xBB) back to Arduino
+        ser.write(ack_byte)
+        print("Sending ACK...")
+        
+#         ser.write(b'A')
+# while True:
+#     received_data = ser.read(1)
+#     if received_data:  # Si hay datos recibidos
+#         ser.write(b'A')
+#     #ser.flush()
+#     # received_data = ser.read(1)
+#     # hex_data = '%02x' % ord(received_data)
+#     print(received_data)
+#     if received_data:  # Si hay datos recibidos
+#         # print(received_data)
+#         # Verificar dirección y manejar la respuesta
+#         if received_data[0] == 0b10101010:  # Cambiar por la dirección correcta
+#             # Aquí puedes enviar la respuesta correspondiente
+#             # response_data = b'Response data'
+#             send_package_with_start(message_test)

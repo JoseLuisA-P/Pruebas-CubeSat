@@ -2,72 +2,105 @@
 #include <SoftwareSerial.h>
 #include "commLib.h"
 
-UARTSocket::UARTSocket(int RX,int TX,int baudrate,int timeout,int maxretries,int en)
-{
-  uart = new SoftwareSerial(RX,TX);
+UARTSocket::UARTSocket(int RX, int TX, int baudrate, int timeout, int maxretries, int en1, int en2) {
+  uart = new SoftwareSerial(RX, TX);
   uart->begin(baudrate);
   _timeout = timeout;
   _maxretries = maxretries;
-  _en = en;
-  pinMode(en,OUTPUT);
-
+  _en1 = en1;
+  _en2 = en2;
+  pinMode(_en1, OUTPUT);
+  pinMode(_en2, OUTPUT);
 }
 
-void UARTSocket::SendPackage(uint8_t* message,size_t messlen)
-{  
+void UARTSocket::SendPackage(uint8_t* message, size_t messlen) {
   int retries = 0;
 
-  while(!_ACK && retries<_maxretries)
-  {
-    digitalWrite(_en,HIGH); // ya esta comenzando en transmision
+  while (!_ACK && retries < _maxretries) {
+    digitalWrite(_en1, HIGH);  // ya esta comenzando en transmision el arduino
+    digitalWrite(_en2, LOW); // entonces el slave comienza en recepcion
+    //Serial.println("modo transmision");
     // envia el mensaje
-    uart->write(message,messlen);
+    uart->write(message, messlen);
+    Serial.println("enviando");
+    Serial.print("Message content: ");
+    for (size_t i = 0; i < messlen; i++) {
+      Serial.print(message[i]);
+      Serial.print(" ");
+    }
+    Serial.println();  // Imprime una nueva línea al final
+    delay(1000);
     unsigned long startTime = millis();
 
-    while (!_ACK && (millis() - startTime) < _timeout) 
-    {
-      digitalWrite(_en,LOW); // cambiamos a modo recepcion
+    while (!_ACK && (millis() - startTime) < _timeout) {
+      digitalWrite(_en1, LOW);  // cambiamos a modo recepcion
+      Serial.println("en1 LOW");
+      digitalWrite(_en2, HIGH);  // cambiamos a modo recepcion
+      Serial.println("en2 HIGH");
+      //Serial.println("modo recepcion");
 
       byte temp = uart->read();
 
-      if (temp == 'A') { // Recibe el ACK
+      if (temp == 'A') {  // Recibe el ACK
         _ACK = true;
-        if(Serial)Serial.println("Data sent successfully!");
-      } 
-        
-      else if (temp == 'N') { // Recibe el NACK
+        if (Serial) Serial.println("Data sent successfully!");
+      }
+
+      else if (temp == 'N') {  // Recibe el NACK
         _ACK = false;
-        if(Serial)Serial.println("NACK received, retrying...");
+        if (Serial) Serial.println("NACK received, retrying...");
         retries++;
         break;
       }
-
     }
   }
 
-  if(!_ACK)
-  {
-    if(Serial)Serial.println("Fallido despues de muchos intentos");
+  if (!_ACK) {
+    if (Serial) Serial.println("Fallido despues de muchos intentos");
   }
 
   _ACK = false;
 }
 
-void UARTSocket::ReceivePackage(){
-//----Leemos la respuesta del Esclavo-----
-  digitalWrite(_en, LOW); //RS485 como receptor
-  if(Serial.find("i"))//esperamos el inicio de trama (start bit, por el momento definimos un char como inicio de paquete)
-  {
-      int dato=Serial.parseInt(); //recibimos valor numérico
-      if(Serial.read()=='f') //Si el fin de trama es el correcto
-       {
-        if(Serial)Serial.println(dato);  //Realizamos la acción correspondiente          
-      }
-      
+// void UARTSocket::ReceivePackage(){
+// //----Leemos la respuesta del Esclavo-----
+//   digitalWrite(_en, LOW); //RS485 como receptor
+//   //Serial.println("modo receptor");
+//   if(Serial.find("i"))//esperamos el inicio de trama (start bit, por el momento definimos un char como inicio de paquete)
+//   {
+//       int dato=Serial.parseInt(); //recibimos valor numérico
+//       if(Serial.read()=='f') //Si el fin de trama es el correcto
+//        {
+//         if(Serial)Serial.println(dato);  //Realizamos la acción correspondiente
+//       }
+
+//   }
+//   digitalWrite(_en, HIGH); //RS485 como Transmisor
+// }
+
+void UARTSocket::ReceivePackage() {
+  // Wait for data to be available
+  while (Serial.available() == 0) {
+    // Do nothing
   }
-  digitalWrite(_en, HIGH); //RS485 como Transmisor
+
+  // Read the data
+  int dato = Serial.read();
+
+  // Check if the data is the start of the packet
+  if (dato == 'i') {
+    // The packet has started
+    // Read the rest of the packet
+    while (Serial.available() > 0) {
+      dato = Serial.read();
+    }
+
+    // The packet has ended
+    // Do something with the data
+  }
 }
-  
+
+
 uint16_t UARTSocket::calculateCRC(uint8_t* data, size_t length) {
   uint16_t crc = _CRC_INITIAL;
 
@@ -112,10 +145,10 @@ uint16_t UARTSocket::calculateCRC(uint8_t* data, size_t length) {
 
 
 // int UARTSocket::receiveDeviceID(int device_address){
-  
+
 // }
 
 // bool UARTSocket::checkDeviceAddress(int received_info, int my_address){
-  
+
 //   return check;
 // }
