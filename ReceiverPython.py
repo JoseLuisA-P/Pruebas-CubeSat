@@ -76,14 +76,15 @@ def send_package(message):
 
 def send_package_with_start():
     # Envía el inicio de trama 'i'
-    ser.write(b'i')
+    ser.write(b'I')
     print('inicio enviado')
     # Envía el paquete de datos
-    send_package(message_test)
+    # send_package(message_test) 
+    ser.write(message_test)
     time.sleep(0.1)  # Añade una pequeña pausa para asegurarte de que el paquete se envíe completamente
     print('paquete enviado')
     # Envía el fin de trama 'f'
-    ser.write(b'f')
+    ser.write(b'F')
     print('stop enviado')
 
 # if __name__ == "__main__":
@@ -94,14 +95,7 @@ while True:
     received_data = ser.read(1)
     if received_data == b'i':  # Si hay datos recibidos
         ser.write(b'A')
-    #ser.flush()
-    # received_data = ser.read(1)
-    # hex_data = '%02x' % ord(received_data)
         print(received_data)
-    # if received_data:  # Si hay datos recibidos
-    #     # print(received_data)
-    #     # Verificar dirección y manejar la respuesta
-    #     if received_data[0] == 0b10101010:  # Cambiar por la dirección correcta
-    #         # Aquí puedes enviar la respuesta correspondiente
-    #         # response_data = b'Response data'
-    #         send_package_with_start(message_test)
+        time.sleep(1)
+        # send_package_with_start()
+        ser.write(b'I')

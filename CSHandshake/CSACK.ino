@@ -20,7 +20,7 @@ uint8_t selfAddress = 001;
 size_t size = 000;
 uint8_t startByte ='i'; // 'i' de inicio de trama
 uint16_t SendCRC = 0;
-
+int dato = 0;
 void setup() {
   Serial.begin(9600);       //Monitor serial de arduino para los loggs
 
@@ -35,7 +35,8 @@ void loop() {
   SendCRC = uart.calculateCRC(startByte,messageSize);
   Serial.println(SendCRC);
   delay(1000);
-  
+  dato = uart.ReceivePackage();
+  // Serial.println(dato);
 
 }
 

@@ -12,49 +12,43 @@ UARTSocket::UARTSocket(int RX, int TX, int baudrate, int timeout, int maxretries
   pinMode(en1, OUTPUT);
   pinMode(en2, OUTPUT);
 }
-void UARTSocket::SendPackage(uint8_t* message,size_t messlen)
-{  
+void UARTSocket::SendPackage(uint8_t* message, size_t messlen) {
   int retries = 0;
 
-  while(!_ACK && retries<_maxretries)
-  {
+  while (!_ACK && retries < _maxretries) {
     _ACK = false;
-    digitalWrite(_en1,HIGH);
-    digitalWrite(_en2,LOW);
-    for (size_t i = 0; i < messlen; i++)
-      {
-        Serial.print(message[i]);
-        Serial.print(" ");
-      }
-      Serial.println();
-    uart->write(message,messlen);
+    digitalWrite(_en1, HIGH);
+    digitalWrite(_en2, LOW);
+    for (size_t i = 0; i < messlen; i++) {
+      Serial.print(message[i]);
+      Serial.print(" ");
+    }
+    Serial.println();
+    uart->write(message, messlen);
     unsigned long startTime = millis();
 
-    while (!_ACK && (millis() - startTime) < _timeout) 
-    {
+    while (!_ACK && (millis() - startTime) < _timeout) {
 
-      digitalWrite(_en1,LOW);
-      digitalWrite(_en2,HIGH);
+      digitalWrite(_en1, LOW);
+      digitalWrite(_en2, HIGH);
       byte temp = uart->read();
 
-      if (temp == 'A') { // Recibe el ACK
+      if (temp == 'A') {  // Recibe el ACK
         _ACK = true;
-        if(Serial)Serial.println("Data sent successfully!");
-      } 
-        
-      else if (temp == 'N') { // Recibe el NACK
+        if (Serial) Serial.println("Data sent successfully!");
+      }
+
+      else if (temp == 'N') {  // Recibe el NACK
         _ACK = false;
-        if(Serial)Serial.println("NACK received, retrying...");
+        if (Serial) Serial.println("NACK received, retrying...");
         retries++;
         break;
       }
-
     }
   }
 
-  if(!_ACK)
-  {
-    if(Serial)Serial.println("Fallido despues de muchos intentos");
+  if (!_ACK) {
+    if (Serial) Serial.println("Fallido despues de muchos intentos");
   }
 
   _ACK = false;
@@ -76,27 +70,36 @@ void UARTSocket::SendPackage(uint8_t* message,size_t messlen)
 //   digitalWrite(_en, HIGH); //RS485 como Transmisor
 // }
 
-void UARTSocket::ReceivePackage() {
-  // Wait for data to be available
-  while (Serial.available() == 0) {
-    // Do nothing
-  }
+int UARTSocket::ReceivePackage() {
+  const int maxArraySize = 6; // Adjust this based on your array size
+  byte receivedArray[maxArraySize]; // Array to hold received bytes
+  int arraySize = 0; // To keep track of the array size
 
-  // Read the data
-  int dato = Serial.read();
-
-  // Check if the data is the start of the packet
-  if (dato == 'i') {
-    // The packet has started
-    // Read the rest of the packet
-    while (Serial.available() > 0) {
-      dato = Serial.read();
+  digitalWrite(_en1, LOW);
+  digitalWrite(_en2, HIGH);
+  int startMssg = uart->read();
+  if (startMssg=='I') {
+    Serial.print("Inicio recibido");
+    // Receive array of bytes
+    while (arraySize < maxArraySize && uart->available()) {
+      receivedArray[arraySize] = uart->read();
+      arraySize++;
     }
 
-    // The packet has ended
-    // Do something with the data
+    if (uart->read() == 'F') {  // Check end of frame
+      // Print the received array
+      Serial.print("Received array: ");
+      for (int i = 0; i < arraySize; i++) {
+        Serial.print(receivedArray[i]);
+        Serial.print(" ");
+      }
+      Serial.println();
+    }
   }
+  
+  return arraySize;  // Return the size of the received array (if needed)
 }
+
 
 
 uint16_t UARTSocket::calculateCRC(uint8_t* data, size_t length) {

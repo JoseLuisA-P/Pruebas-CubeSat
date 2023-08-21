@@ -18,7 +18,7 @@ class UARTSocket
     UARTSocket(int RX,int TX,int baudrate,int timeout,int maxretries,int en1, int en2);
     void SendPackage(uint8_t* message,size_t messlen);
     uint16_t calculateCRC(uint8_t* data, size_t length); 
-    void UARTSocket::ReceivePackage();
+    int UARTSocket::ReceivePackage();
     
 
 
