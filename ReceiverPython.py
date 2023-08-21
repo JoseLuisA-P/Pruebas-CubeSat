@@ -5,7 +5,7 @@ import binascii
 SERIAL_PORT = 'COM4'
 BAUD_RATE = 9600
 message_test = [105, 42,43,44,45, 102] # 105 corresponde a "i" y 102 a "f"
-ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=2)
+ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
 def receive_data_with_ack():
     
     received_data = bytearray()
@@ -92,7 +92,7 @@ def send_package_with_start():
 # ciclo de escucha y trasmision
 while True:
     received_data = ser.read(1)
-    if received_data:  # Si hay datos recibidos
+    if received_data == b'i':  # Si hay datos recibidos
         ser.write(b'A')
     #ser.flush()
     # received_data = ser.read(1)

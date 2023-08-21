@@ -18,13 +18,21 @@ void UARTSocket::SendPackage(uint8_t* message,size_t messlen)
 
   while(!_ACK && retries<_maxretries)
   {
+    _ACK = false;
     digitalWrite(_en1,HIGH);
     digitalWrite(_en2,LOW);
+    for (size_t i = 0; i < messlen; i++)
+      {
+        Serial.print(message[i]);
+        Serial.print(" ");
+      }
+      Serial.println();
     uart->write(message,messlen);
     unsigned long startTime = millis();
 
     while (!_ACK && (millis() - startTime) < _timeout) 
     {
+
       digitalWrite(_en1,LOW);
       digitalWrite(_en2,HIGH);
       byte temp = uart->read();
