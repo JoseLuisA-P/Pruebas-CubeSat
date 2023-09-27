@@ -12,11 +12,13 @@ UARTSocket::UARTSocket(int RX, int TX, int baudrate, int timeout, int maxretries
   pinMode(en1, OUTPUT);
   pinMode(en2, OUTPUT);
 }
+
 void UARTSocket::SendPackage(uint8_t* message, size_t messlen) {
   int retries = 0;
 
   while (!_ACK && retries < _maxretries) {
     _ACK = false;
+    // hacer el cambio a transmision del master y que el slave este en modo recepcion
     digitalWrite(_en1, HIGH);
     digitalWrite(_en2, LOW);
     for (size_t i = 0; i < messlen; i++) {
@@ -54,22 +56,6 @@ void UARTSocket::SendPackage(uint8_t* message, size_t messlen) {
   _ACK = false;
 }
 
-// void UARTSocket::ReceivePackage(){
-// //----Leemos la respuesta del Esclavo-----
-//   digitalWrite(_en, LOW); //RS485 como receptor
-//   //Serial.println("modo receptor");
-//   if(Serial.find("i"))//esperamos el inicio de trama (start bit, por el momento definimos un char como inicio de paquete)
-//   {
-//       int dato=Serial.parseInt(); //recibimos valor numérico
-//       if(Serial.read()=='f') //Si el fin de trama es el correcto
-//        {
-//         if(Serial)Serial.println(dato);  //Realizamos la acción correspondiente
-//       }
-
-//   }
-//   digitalWrite(_en, HIGH); //RS485 como Transmisor
-// }
-
 int UARTSocket::ReceivePackage() {
   const int maxArraySize = 6; // Adjust this based on your array size
   byte receivedArray[maxArraySize]; // Array to hold received bytes
@@ -100,8 +86,7 @@ int UARTSocket::ReceivePackage() {
   return arraySize;  // Return the size of the received array (if needed)
 }
 
-
-
+// Segun la tesis de Delft, el calculo del CRC al final del paquete
 uint16_t UARTSocket::calculateCRC(uint8_t* data, size_t length) {
   uint16_t crc = _CRC_INITIAL;
 
@@ -117,39 +102,3 @@ uint16_t UARTSocket::calculateCRC(uint8_t* data, size_t length) {
 
   return crc;
 }
-
-/*Device identification
-  sendDeviceId: 
-  Params to receive > device address
-  it establishes the slaves' addresses
-  checkDeviceAddress:
-  Params to receive >  received_info, my_address
-  Each byte begins and ends with a start and stop bit,
-  following the UART standard. When the address bit is set to one by any of the nodes,
-  it causes an interrupt in the other nodes on the bus. Each node then checks if the
-  address matches its own. If it is not addressed, the node can ignore subsequent
-  bytes (address bits being zero).
-*/
-// int UARTSocket::sendDeviceId(int device_address){
-//   if (device_address < 0 || device_address > 255) {
-//       // Handle the error
-//       Serial.println("Device address out of range");
-//       return -1; // indicate an error condition
-//   }
-
-//   // toggle pin to send mode
-
-//   // send address
-//   SendPackage(device_address)
-
-// }
-
-
-// int UARTSocket::receiveDeviceID(int device_address){
-
-// }
-
-// bool UARTSocket::checkDeviceAddress(int received_info, int my_address){
-
-//   return check;
-// }
