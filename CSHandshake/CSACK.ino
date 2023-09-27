@@ -1,9 +1,9 @@
 #include <SoftwareSerial.h>
-#include "commLib.h"
+#include "commLib.h" // Libreria en proceso para OBC
 
 #define RX_PIN 10
 #define TX_PIN 11
-#define EN1_PIN 9
+#define EN1_PIN 9 
 #define EN2_PIN 8
 
 #define BAUDRATE 9600
