@@ -93,6 +93,7 @@ def send_package_with_start():
 # ciclo de escucha y trasmision
 while True:
     received_data = ser.read(1)
+    print(received_data)
     if received_data == b'i':  # Si hay datos recibidos
         ser.write(b'A')
         print(received_data)

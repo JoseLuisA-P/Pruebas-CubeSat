@@ -22,6 +22,7 @@ void UARTSocket::SendPackage(uint8_t* message, size_t messlen) {
     digitalWrite(_en1, HIGH);
     digitalWrite(_en2, LOW);
     for (size_t i = 0; i < messlen; i++) {
+      
       Serial.print(message[i]);
       Serial.print(" ");
     }
@@ -33,6 +34,7 @@ void UARTSocket::SendPackage(uint8_t* message, size_t messlen) {
 
       digitalWrite(_en1, LOW);
       digitalWrite(_en2, HIGH);
+      
       byte temp = uart->read();
 
       if (temp == 'A') {  // Recibe el ACK
